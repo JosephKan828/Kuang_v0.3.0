@@ -1,0 +1,11 @@
+# ====================================================
+# Scaling for different state vector
+# ====================================================
+
+[Init]
+w1scale = 100.0 # scaling on vertical motion
+w2scale = 100.0
+T1scale = 10.0  # scaling on temperature
+T2scale = 10.0
+qscale  = 0.1   # scaling on moisture
+Lscale  = 100.0 # scaling on convective heating

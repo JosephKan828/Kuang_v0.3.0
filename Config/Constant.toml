@@ -1,0 +1,7 @@
+# ====================================================
+# Constant table
+# ====================================================
+[Constant]
+g = 9.80665 # Gravitational acceleration, unit m/s^2
+Rd = 287.5  # Gas constant for ideal gas
+Cp = 1004.5 # specific heat capacity

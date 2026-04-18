@@ -1,0 +1,21 @@
+# Academic plot style for single-series eigenmode figures
+figure.dpi: 300
+savefig.dpi: 300
+font.family: serif
+font.size: 12
+axes.labelsize: 13
+axes.titlesize: 14
+xtick.labelsize: 12
+ytick.labelsize: 12
+axes.linewidth: 1.0
+lines.linewidth: 2.0
+lines.markersize: 6
+xtick.direction: in
+ytick.direction: in
+xtick.top: True
+ytick.right: True
+grid.color: 0.85
+grid.linestyle: --
+grid.linewidth: 0.8
+axes.grid: True
+grid.alpha: 0.9
