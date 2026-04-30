@@ -3,9 +3,9 @@
 # ====================================================
 
 [Init]
-w1scale = 100.0 # scaling on vertical motion
-w2scale = 100.0
-T1scale = 10.0  # scaling on temperature
-T2scale = 10.0
-qscale  = 0.1   # scaling on moisture
-Lscale  = 100.0 # scaling on convective heating
+w1scale = 1.0 # scaling on vertical motion, defualt: 100
+w2scale = 1.0
+T1scale = 1.0  # scaling on temperature, default: 10
+T2scale = 1.0
+qscale  = 1   # scaling on moisture, default: 0.1
+Lscale  = 1.0 # scaling on convective heating, default: 100
