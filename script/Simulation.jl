@@ -160,8 +160,6 @@ function main(
 
     end
 
-    # InitState = reshape(scale_factors, 6, 1, 1) .* randn(ComplexF64, 6, domain.Ens, length(k)) # Shape: (nstate, nens, nk)
-
     # ------------------------------------------------
     # Run the time stepper
     # ------------------------------------------------
@@ -175,7 +173,7 @@ function main(
     # ------------------------------------------------
     # Calculate radiative heating for each time step
     # ------------------------------------------------
-    rad_heating = DerivePhy_Radiation(model, sim_result)
+    # rad_heating = DerivePhy_Radiation(model, sim_result)
 
     # ------------------------------------------------
     # Save results
@@ -207,20 +205,20 @@ function main(
     end
 
     # Save radiative heating
-    h5open(output_path*"Radiation.h5", "w") do file
-        write(file, "qLW1", Array(rad_heating.qLW1))
-        write(file, "qLW2", Array(rad_heating.qLW2))
-        write(file, "qSW1", Array(rad_heating.qSW1))
-        write(file, "qSW2", Array(rad_heating.qSW2))
-        write(file, "tLW1", Array(rad_heating.tLW1))
-        write(file, "tLW2", Array(rad_heating.tLW2))
-        write(file, "tSW1", Array(rad_heating.tSW1))
-        write(file, "tSW2", Array(rad_heating.tSW2))
-        write(file, "wLW1", Array(rad_heating.wLW1))
-        write(file, "wLW2", Array(rad_heating.wLW2))
-        write(file, "wSW1", Array(rad_heating.wSW1))
-        write(file, "wSW2", Array(rad_heating.wSW2))
-    end
+    # h5open(output_path*"Radiation.h5", "w") do file
+    #     write(file, "qLW1", Array(rad_heating.qLW1))
+    #     write(file, "qLW2", Array(rad_heating.qLW2))
+    #     write(file, "qSW1", Array(rad_heating.qSW1))
+    #     write(file, "qSW2", Array(rad_heating.qSW2))
+    #     write(file, "tLW1", Array(rad_heating.tLW1))
+    #     write(file, "tLW2", Array(rad_heating.tLW2))
+    #     write(file, "tSW1", Array(rad_heating.tSW1))
+    #     write(file, "tSW2", Array(rad_heating.tSW2))
+    #     write(file, "wLW1", Array(rad_heating.wLW1))
+    #     write(file, "wLW2", Array(rad_heating.wLW2))
+    #     write(file, "wSW1", Array(rad_heating.wSW1))
+    #     write(file, "wSW2", Array(rad_heating.wSW2))
+    # end
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__

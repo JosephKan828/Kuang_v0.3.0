@@ -7,9 +7,9 @@
 T = 30.0       # Total time of simulation, unit: day
 X = 40000000.0 # Maximum size of horizontal domain, unit: m
 Z = 14000.0    # The upper boundary of vertical domain, unit: m
-Ens = 10       # Ensemble size
+Ens = 20       # Ensemble size
 
-dt = 0.5      # Time step, unit: day
+dt = 0.25      # Time step, unit: day
 dx = 50000.0   # horizontal spacing, unit: m
 dz = 200.0     # vertical spacing, unit: m
 

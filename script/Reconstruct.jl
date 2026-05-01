@@ -8,6 +8,7 @@
 # ====================================================
 # Official package
 using HDF5
+using Statistics
 using LinearAlgebra
 
 # Individual module
@@ -181,7 +182,7 @@ function main(
 
     # Defining variable mapping
     state_vars = ["w1", "w2", "T1", "T2", "J1", "J2"]
-    rad_vars   = ["qLW1", "qLW2", "qSW1", "qSW2", "tLW1", "tLW2", "tSW1", "tSW2", "wLW1", "wLW2", "wSW1", "wSW2"]
+    # rad_vars   = ["qLW1", "qLW2", "qSW1", "qSW2", "tLW1", "tLW2", "tSW1", "tSW2", "wLW1", "wLW2", "wSW1", "wSW2"]
 
     # ------------------------------------------------
     # Generate basis
@@ -213,39 +214,51 @@ function main(
             write(h5g, "z", z)
 
             # Process ALL variables one by one
-            all_vars = ["w1", "w2", "T1", "T2", "J1", "J2", "qLW1", "qLW2", "qSW1", "qSW2", "tLW1", "tLW2", "tSW1", "tSW2", "wLW1", "wLW2", "wSW1", "wSW2"]
+            # all_vars = ["w1", "w2", "T1", "T2", "J1", "J2", "qLW1", "qLW2", "qSW1", "qSW2", "tLW1", "tLW2", "tSW1", "tSW2", "wLW1", "wLW2", "wSW1", "wSW2"]
+            all_vars = ["w1", "w2", "T1", "T2", "J1", "J2"]
             
-            @inbounds for var in all_vars
-                # Select source file
-                src_file = var in state_vars ? "State.h5" : "Radiation.h5"
 
+            @inbounds for var in all_vars
                 # Load data
-                var_data = h5read(joinpath(input_path, src_file), var)
+                var_data = h5read(joinpath(input_path, "State.h5"), var)
 
                 nens, nt, _ = size(var_data)
 
+                # calculate daily averaged data
+                day_length:: Int = 1 / domain.dt
+                nt_daily = floor(Int, nt // day_length) - 1
+                daily_data = Array{ComplexF64}(undef, nens, nt_daily, nk)
+
+                for i in 1:nt_daily
+                    idx_start = (i-1)*day_length + 1
+                    idx_end = i*day_length
+                    daily_data[:, i, :] .= mean(var_data[:, idx_start:idx_end, :], dims=2)[:, 1, :]
+                end
+
                 # pre-allocate: create empty dataset
-                dset_f = create_dataset(h5f, var, datatype(ComplexF64), dataspace(nens, nt, nx, nk))
-                dset_g = create_dataset(h5g, var, datatype(ComplexF64), dataspace(nens, nt, nx, nz, nk))
+                dset_f = create_dataset(h5f, var, datatype(ComplexF64), dataspace(nens, nt_daily, nx, nk))
+                dset_g = create_dataset(h5g, var, datatype(ComplexF64), dataspace(nens, nt_daily, nx, nz, nk))
 
                 # Select appropriate basis
                 basis = if  var == "w1" G1
                 elseif var == "w2" G2
-                elseif var in ["T1", "J1", "qLW1", "qSW1", "tLW1", "tSW1", "wLW1", "wSW1"] G1_strat
+                elseif var in ["T1", "J1"] G1_strat
                 else G2_strat
                 end
 
                 # Compute and write
+                lk = ReentrantLock()
                 Threads.@threads for j in 1:nk
                     ## Fourier reconstruction
-                    f_slice = _reconstruct_Fourier(var_data[:, :, j], FourierBasis[:, j])
-
-                    dset_f[:, :, :, j] = f_slice
+                    f_slice = _reconstruct_Fourier(daily_data[:, :, j], FourierBasis[:, j])
 
                     ## Galerkin reconstruction
                     g_slice = _reconstruct_Galerkin(real.(f_slice), basis)
 
-                    dset_g[:, :, :, :, j] = g_slice .* ρ_inv
+                    lock(lk) do
+                        dset_f[:, :, :, j] = f_slice
+                        dset_g[:, :, :, :, j] = g_slice .* ρ_inv
+                    end
                 end
 
                 var_data = nothing
